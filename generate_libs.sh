@@ -1,14 +1,14 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: make </path/to/plugin>"
+    echo "Usage: make dir=</path/to/plugin>"
     exit 1;
 fi
 
 DIRECTORY="$1"
 DIRECTORY=${DIRECTORY%/}  # Trim trailing slash
 COMPOSER_LOCK="$DIRECTORY/composer.lock"
-THIRD_PARTY_LIBS="$DIRECTORY/thirdpartylibsTEST.xml"
+THIRD_PARTY_LIBS="$DIRECTORY/thirdpartylibs.xml"
 
 if [ ! -f "$COMPOSER_LOCK" ]; then
     echo "composer.lock not found in $DIRECTORY"
