@@ -8,7 +8,7 @@ fi
 DIRECTORY="$1"
 DIRECTORY=${DIRECTORY%/}  # Trim trailing slash
 COMPOSER_LOCK="$DIRECTORY/composer.lock"
-THIRD_PARTY_LIBS="$DIRECTORY/thirdpartylibs.xml"
+THIRD_PARTY_LIBS="$DIRECTORY/thirdpartylibsTEST.xml"
 
 if [ ! -f "$COMPOSER_LOCK" ]; then
     echo "composer.lock not found in $DIRECTORY"
@@ -17,6 +17,24 @@ fi
 
 echo '<?xml version="1.0"?>
 <libraries>' > "$THIRD_PARTY_LIBS"
+
+# Getting the Composer version
+COMPOSER_VERSION=$(composer --version | awk '{print $3}')
+
+{
+    echo "    <library>"
+    echo "        <location>vendor/autoload.php</location>"
+    echo "        <name>autoload.php</name>"
+    echo "        <version>$COMPOSER_VERSION</version>"
+    echo "        <license>MIT</license>"
+    echo "    </library>"
+    echo "    <library>"
+    echo "        <location>vendor/composer</location>"
+    echo "        <name>composer</name>"
+    echo "        <version>$COMPOSER_VERSION</version>"
+    echo "        <license>MIT</license>"
+    echo "    </library>"
+}  >> "$THIRD_PARTY_LIBS"
 
 # Parse the composer.lock file and extract required information
 packages=$(jq -c '.packages[] | {name: .name, version: .version, license: .license, licenseversion: .licenseversion}' < "$COMPOSER_LOCK")
@@ -28,7 +46,7 @@ echo "$packages" | while IFS= read -r package; do
 
     {
         echo "    <library>"
-        echo "        <location>vendor/$name/</location>"
+        echo "        <location>vendor/$name</location>"
         echo "        <name>$name</name>"
         echo "        <version>$version</version>"
         echo "        <license>$license</license>"
